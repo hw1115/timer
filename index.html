@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#101827">
+<title>5분 간격 시간 감각 훈련</title>
+<style>
+:root{color-scheme:dark;--bg:#0e1726;--panel:#192538;--panel2:#202e42;--text:#f3f6fb;--muted:#a6b2c4;--green:#43c779;--line:#2d3a4e}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 28% 20%,#17243a 0,#0e1726 58%);color:var(--text);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Noto Sans KR",sans-serif;min-height:100vh}
+header{display:flex;align-items:center;gap:14px;padding:22px clamp(18px,4vw,48px);border-bottom:1px solid var(--line)}
+.logo{font-size:32px}h1{font-size:clamp(19px,2.4vw,27px);margin:0}header p{margin:4px 0 0;color:var(--muted);font-size:14px}
+main{max-width:1100px;margin:0 auto;padding:clamp(18px,4vw,42px);display:grid;grid-template-columns:minmax(0,1.35fr) minmax(260px,.75fr);gap:24px}
+.panel{background:linear-gradient(145deg,rgba(34,47,67,.94),rgba(23,35,53,.96));border:1px solid #26344a;border-radius:20px;padding:24px;box-shadow:0 12px 32px #0002}
+.timer-panel{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:470px;text-align:center}
+.ring{width:min(72vw,340px);aspect-ratio:1;border-radius:50%;display:grid;place-items:center;position:relative;background:conic-gradient(var(--green) var(--progress,0%),#354258 0);transition:background .3s}
+.ring:before{content:"";position:absolute;inset:11px;border-radius:50%;background:#111b2b}
+.timer-content{position:relative;z-index:1}.eyebrow{color:var(--muted);font-size:15px;margin-bottom:10px}.time{font-size:clamp(36px,6vw,56px);letter-spacing:1px;font-variant-numeric:tabular-nums;white-space:nowrap}.sub{color:var(--muted);margin:12px 0 24px;font-size:14px}
+button{border:0;border-radius:11px;padding:12px 20px;font:inherit;font-weight:650;cursor:pointer;transition:filter .15s,transform .15s}button:hover{filter:brightness(1.08)}button:active{transform:scale(.98)}button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid #7ddda0;outline-offset:3px}.primary{background:var(--green);color:#082014;min-width:145px}.secondary{background:#2a3a51;color:var(--text);border:1px solid #40506a}.danger{background:#452b36;color:#ffdbe1;border:1px solid #65404b}.actions{display:flex;gap:9px;justify-content:center;flex-wrap:wrap}
+.side{display:flex;flex-direction:column;gap:18px}.panel h2{font-size:17px;margin:0 0 20px}.setting{display:grid;grid-template-columns:1fr auto;align-items:center;gap:12px;margin:15px 0}.setting label{font-size:14px}.setting input[type=number],select{width:90px;background:#111b2a;border:1px solid #3b4b62;color:var(--text);border-radius:8px;padding:9px;font:inherit}.number-wrap{display:flex;align-items:center;gap:7px}.setting input[type=range]{width:110px;accent-color:var(--green)}.range-wrap{display:flex;align-items:center;gap:8px}.small{font-size:12px;color:var(--muted);line-height:1.55}.notice{margin:0 0 18px;padding:11px 13px;border:1px solid #5c4b2d;background:#30291d;border-radius:10px;color:#f3d8a5;font-size:12px;line-height:1.55}
+.tips{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.tip{display:flex;gap:12px;align-items:center}.tip-icon{font-size:25px}.tip strong{display:block;font-size:14px}.tip span{color:var(--muted);font-size:12px}
+footer{text-align:center;color:#8290a5;padding:0 20px 28px;font-size:12px}
+@media(max-width:760px){main{grid-template-columns:1fr;padding:16px}.timer-panel{min-height:390px}.ring{width:min(76vw,310px)}.tips{grid-template-columns:1fr}.panel{padding:19px}header{padding:17px}}
+</style>
+</head>
+<body>
+<header><div class="logo" aria-hidden="true">◷</div><div><h1>5분 간격 시간 감각 훈련</h1><p>몰입을 방해하지 않고 시간 흐름을 인식하는 훈련 타이머</p></div></header>
+<main>
+<section class="panel timer-panel" aria-label="타이머">
+  <div class="ring" id="ring" style="--progress:0%">
+    <div class="timer-content">
+      <div class="eyebrow" id="status">준비 완료</div>
+      <div class="time" id="time">01:35:00</div>
+      <div class="sub" id="sub">총 95분 · 5분 간격 알림</div>
+      <div class="actions"><button class="primary" id="start">▶ 시작하기</button><button class="secondary" id="pause" hidden>일시정지</button><button class="danger" id="reset" hidden>종료</button></div>
+    </div>
+  </div>
+  <p class="small" style="margin:20px 0 0">알림은 짧은 소리 한 번만 재생됩니다. 시간 숫자는 시작 전과 종료 후에만 표시됩니다.</p>
+</section>
+<aside class="side">
+  <section class="panel">
+    <h2>훈련 설정</h2>
+    <div class="setting"><label for="duration">총 시간</label><div class="number-wrap"><input id="duration" type="number" min="5" max="240" step="5" value="95"><span>분</span></div></div>
+    <div class="setting"><label for="interval">알림 간격</label><div class="number-wrap"><input id="interval" type="number" min="1" max="60" value="5"><span>분</span></div></div>
+    <div class="setting"><label for="tone">알림 소리</label><select id="tone"><option value="ding">맑은 띵</option><option value="soft">부드러운 톤</option><option value="beep">짧은 비프</option></select></div>
+    <div class="setting"><label for="volume">소리 크기</label><div class="range-wrap"><input id="volume" type="range" min="10" max="100" value="55"><span id="volLabel">55%</span></div></div>
+    <p class="small">실행 중에는 설정이 잠깁니다. 시작 전에 원하는 값을 정하세요.</p>
+  </section>
+  <section class="panel">
+    <h2>사용 팁</h2>
+    <p class="small">• 알림이 울려도 문제 풀이를 멈출 필요는 없습니다.</p>
+    <p class="small">• 훈련 목표는 5분 감각을 익히는 것이지, 매번 알림을 기다리는 것이 아닙니다.</p>
+    <p class="small">• 브라우저/기기 설정에 따라 잠금 화면이나 백그라운드에서 알림이 지연될 수 있습니다.</p>
+    <p class="small">• 처음 사용할 때 시작 버튼을 눌러 소리 재생을 허용하세요.</p>
+  </section>
+</aside>
+<section class="panel tips">
+  <div class="tip"><div class="tip-icon">♬</div><div><strong>5분마다 짧은 알림</strong><span>공부를 멈추지 않고 계속하세요</span></div></div>
+  <div class="tip"><div class="tip-icon">◷</div><div><strong>시간 표시 최소화</strong><span>숫자 대신 감각에 집중하세요</span></div></div>
+  <div class="tip"><div class="tip-icon">◎</div><div><strong>95분 집중 세션</strong><span>원하는 시간과 간격으로 조정 가능</span></div></div>
+</section>
+</main>
+<footer>시간 지각 훈련용 간단한 실험 도구 · 훈련 효과를 보장하지 않습니다.</footer>
+<script>
+(() => {
+ const $ = id => document.getElementById(id);
+ const startBtn=$('start'), pauseBtn=$('pause'), resetBtn=$('reset');
+ let running=false, paused=false, durationSec=5700, intervalSec=300, endAt=0, remaining=5700, nextAlert=300, ticker=null, audioCtx=null;
+ const fmt=s=>{s=Math.max(0,Math.ceil(s));const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sec=s%60;return [h,m,sec].map(v=>String(v).padStart(2,'0')).join(':')};
+ function settings(){durationSec=Math.max(300,Math.min(14400,Number($('duration').value||95)*60));intervalSec=Math.max(60,Math.min(3600,Number($('interval').value||5)*60));remaining=durationSec;nextAlert=intervalSec}
+ function lockSettings(lock){['duration','interval','tone','volume'].forEach(id=>$(id).disabled=lock)}
+ function paint(){const elapsed=durationSec-remaining;$('ring').style.setProperty('--progress',`${Math.min(100,elapsed/durationSec*100)}%`);$('time').textContent=running?'·····':fmt(remaining);$('status').textContent=paused?'일시정지':running?'훈련 중':'준비 완료';$('sub').textContent=`총 ${Math.round(durationSec/60)}분 · ${Math.round(intervalSec/60)}분 간격 알림`}
+ async function ensureAudio(){const AC=window.AudioContext||window.webkitAudioContext;if(!AC)throw new Error('이 브라우저는 오디오 재생을 지원하지 않습니다.');if(!audioCtx)audioCtx=new AC();if(audioCtx.state==='suspended')await audioCtx.resume()}
+ function chime(){if(!audioCtx)return;const now=audioCtx.currentTime;const type=$('tone').value;const osc=audioCtx.createOscillator(),gain=audioCtx.createGain();osc.connect(gain);gain.connect(audioCtx.destination);osc.type=type==='beep'?'square':'sine';osc.frequency.setValueAtTime(type==='soft'?660:type==='beep'?880:1046,now);if(type==='ding')osc.frequency.exponentialRampToValueAtTime(784,now+.22);gain.gain.setValueAtTime(0.0001,now);gain.gain.exponentialRampToValueAtTime(Number($('volume').value)/100*.18,now+.025);gain.gain.exponentialRampToValueAtTime(.0001,now+(type==='soft'?.22:.28));osc.start(now);osc.stop(now+(type==='soft'?.24:.3))}
+ function tick(){if(!running||paused)return;remaining=Math.max(0,(endAt-Date.now())/1000);while(durationSec-remaining>=nextAlert&&nextAlert<durationSec){chime();nextAlert+=intervalSec}if(remaining<=0){running=false;paused=false;clearInterval(ticker);ticker=null;lockSettings(false);startBtn.hidden=false;startBtn.textContent='다시 시작';pauseBtn.hidden=true;resetBtn.hidden=true;$('status').textContent='훈련 완료';$('time').textContent='완료!';$('sub').textContent='수고했습니다. 세션이 끝났습니다.'; $('ring').style.setProperty('--progress','100%');return}paint()}
+ startBtn.addEventListener('click',async()=>{try{await ensureAudio()}catch(e){alert(e.message);return}if(!running){settings();running=true;paused=false;endAt=Date.now()+remaining*1000;lockSettings(true);startBtn.hidden=true;pauseBtn.hidden=false;resetBtn.hidden=false;tick();ticker=setInterval(tick,150)}});
+ pauseBtn.addEventListener('click',()=>{if(!running)return;if(!paused){remaining=Math.max(0,(endAt-Date.now())/1000);paused=true;clearInterval(ticker);ticker=null;pauseBtn.textContent='계속하기';paint()}else{paused=false;endAt=Date.now()+remaining*1000;pauseBtn.textContent='일시정지';tick();ticker=setInterval(tick,150)}});
+ resetBtn.addEventListener('click',()=>{running=false;paused=false;clearInterval(ticker);ticker=null;lockSettings(false);startBtn.hidden=false;startBtn.textContent='▶ 다시 시작';pauseBtn.hidden=true;resetBtn.hidden=true;settings();paint()});
+ $('volume').addEventListener('input',()=> $('volLabel').textContent=$('volume').value+'%');
+ document.addEventListener('visibilitychange',()=>{if(running&&!paused&&document.hidden){/* timer uses wall-clock time; alerts may be delayed by browser background limits */}});
+ settings();paint();
+})();
+</script>
+</body>
+</html>
